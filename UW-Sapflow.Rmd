@@ -84,5 +84,5 @@ pdf_nodes  %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + th
 Combine all the  5 nodes, and do raw trace plot
 ```{r pressure, echo=FALSE}
 pdf_nodes <- rbind(pdf_summary_1,pdf_summary_2,pdf_summary_3,pdf_summary_4,pdf_summary_5)
-pdf_nodes  %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + theme_classic() + labs(x="Date",y="Log10 Mean HR", caption="Source : dotmote.com") + scale_y_log10()
+pdf_nodes  %>% filter(meanhr <2) %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + theme_classic() + labs(x="Date",y="Log10 Mean HR", caption="Source : dotmote.com") 
 ```
