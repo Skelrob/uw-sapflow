@@ -1,0 +1,82 @@
+---
+title: "UW-Sapflow"
+author: "Aji John"
+date: "10/4/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## R Markdown
+
+This is an R Markdown document for UW Sapflow. 
+
+
+Just do Node 1, raw statistics
+
+```{r }
+#plot summary 1
+pdf_summary_1 <-  read_csv('1_summary.csv')
+#convert the unix timestamp
+pdf_summary_1$date <-  as.POSIXct(pdf_summary_1$unix_timestamp, origin="1970-01-01")
+pdf_summary_1$ymd <- as.Date(pdf_summary_1$date, "%Y-%m-%d")
+str(pdf_summary_1)
+```
+
+## Including Plots
+
+Mean HR plot
+
+```{r pressure, echo=FALSE}
+pdf_summary_1 %>% ggplot(aes(date,meanhr)) + geom_line() + geom_smooth(method = "loess", se = TRUE) + theme_classic() + labs(x="Date",y="Mean HR", caption="Source : dotmote.com")
+```
+
+Extract max Mean HR for each day.
+
+```{r pressure, echo=FALSE}
+pdf_summary_1 %>% group_by(ymd) %>% mutate(maxhr=max(meanhr),minhr=min(meanhr)) %>% ggplot() + geom_line(aes(date,maxhr,color='Max')) + geom_line(aes(date,minhr,color='Min')) + theme_classic() + theme(plot.title = element_text(hjust = 0.5)) +  labs(x="Date",y="Mean HR", caption="Source : dotmote.com",colour = "",title="Node 1") 
+```
+
+Combine the data for all the nodes
+
+
+```{r pressure, echo=FALSE}
+pdf_summary_2 <-  read_csv('2_summary.csv')
+#convert the unix timestamp
+pdf_summary_2$date <-  as.POSIXct(pdf_summary_2$unix_timestamp, origin="1970-01-01")
+pdf_summary_2$ymd <- as.Date(pdf_summary_2$date, "%Y-%m-%d")
+pdf_summary_3 <-  read_csv('3_summary.csv')
+#convert the unix timestamp
+pdf_summary_3$date <-  as.POSIXct(pdf_summary_3$unix_timestamp, origin="1970-01-01")
+pdf_summary_3$ymd <- as.Date(pdf_summary_3$date, "%Y-%m-%d")
+pdf_summary_4 <-  read_csv('4_summary.csv')
+#convert the unix timestamp
+pdf_summary_4$date <-  as.POSIXct(pdf_summary_4$unix_timestamp, origin="1970-01-01")
+pdf_summary_4$ymd <- as.Date(pdf_summary_4$date, "%Y-%m-%d")
+pdf_summary_5 <-  read_csv('5_summary.csv')
+#convert the unix timestamp
+pdf_summary_5$date <-  as.POSIXct(pdf_summary_5$unix_timestamp, origin="1970-01-01")
+pdf_summary_5$ymd <- as.Date(pdf_summary_5$date, "%Y-%m-%d")
+```
+
+Lets look at it individually with transforming(log 10)
+```{r pressure, echo=FALSE}
+pdf_nodes <- rbind(pdf_summary_1,pdf_summary_2,pdf_summary_3,pdf_summary_4,pdf_summary_5)
+pdf_nodes  %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + theme_classic() + facet_grid(nodeID~.) + labs(x="Date",y="Log10 Mean HR", caption="Source : dotmote.com") + scale_y_log10()
+```
+Lets look at it individually (drop log base 10)
+```{r pressure, echo=FALSE}
+pdf_nodes <- rbind(pdf_summary_1,pdf_summary_2,pdf_summary_3,pdf_summary_4,pdf_summary_5)
+pdf_nodes  %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + theme_classic() + facet_grid(nodeID~.) + labs(x="Date",y="Log10 Mean HR", caption="Source : dotmote.com",colour="") +
+  scale_y_continuous(limits = c(0, 2))
+```
+
+
+Combine all the  5 nodes, and do raw trace plot
+```{r pressure, echo=FALSE}
+pdf_nodes <- rbind(pdf_summary_1,pdf_summary_2,pdf_summary_3,pdf_summary_4,pdf_summary_5)
+pdf_nodes  %>% ggplot(aes(date,meanhr,color=factor(nodeID))) + geom_line()  + theme_classic() + labs(x="Date",y="Log10 Mean HR", caption="Source : dotmote.com") + scale_y_log10()
+```
